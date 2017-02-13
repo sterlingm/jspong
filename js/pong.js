@@ -20,6 +20,26 @@ class Rect
     this.pos = new Vec2(x, y);
     this.size = new Vec2(w, h);
   }
+
+  get left()
+  {
+    return this.pos.x - this.size.x / 2;
+  }
+
+  get right()
+  {
+    return this.pos.x + this.size.x / 2;
+  }
+
+  get top()
+  {
+    return this.pos.y - this.size.y / 2;
+  }
+
+  get bottom()
+  {
+    return this.pos.y + this.size.y / 2;
+  }
 }
 
 class Ball extends Rect
@@ -65,11 +85,11 @@ function update(dt)
   ball.pos.x += ball.vel.x * dt;
   ball.pos.y += ball.vel.y * dt;
 
-  if(ball.pos.x >= canvas.width || ball.pos.x <= 0)
+  if(ball.right >= canvas.width || ball.left <= 0)
   {
     ball.vel.x *= -1;
   }
-  if(ball.pos.y >= canvas.height || ball.pos.y <= 0)
+  if(ball.top >= canvas.height || ball.bottom <= 0)
   {
     ball.vel.y *= -1;
   }
