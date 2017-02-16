@@ -48,13 +48,15 @@ class Player extends Rect
   {
     if (left)
     {
-      super(0, 0, 10, 50);
+      super(10, 0, 10, 100);
     }
     else
     {
-      super(WIDTH-10, 0, 10, 50);
+      super(WIDTH-20, 0, 10, 100);
     }
+    
     this.vel = new Vec2;
+    this.score = 0;
   }
 }
 
@@ -74,7 +76,7 @@ class Pong
   {
     this._canvas = canvas;
     this._context = canvas.getContext('2d');
-    
+  
     this.ball = new Ball();
     this.ball.pos.x = 100;
     this.ball.pos.y = 100;
@@ -101,6 +103,15 @@ class Pong
     callback();
   }
 
+  /*
+   * Draws a rectangle in the context
+   * @param 0 Rect object to draw
+   */
+  drawRect(rect)
+  {
+    this._context.fillStyle = '#fff';
+    this._context.fillRect(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
+  }
 
 
   /*
@@ -143,16 +154,27 @@ class Pong
     this._context.fillStyle = '#000';
     this._context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Create the this.ball
-    this._context.fillStyle = '#fff';
-    this._context.fillRect(this.ball.pos.x, this.ball.pos.y, this.ball.size.x, this.ball.size.y);
+    // Draw the ball
+    this.drawRect(this.ball);
 
-    // Create the this.players
-    this._context.fillRect(this.player1.pos.x, this.player1.pos.y, this.player1.size.x, this.player1.size.y);
-    this._context.fillRect(this.player2.pos.x, this.player2.pos.y, this.player2.size.x, this.player2.size.y);
+    // Draw the players
+    this.drawRect(this.player1);
+    this.drawRect(this.player2);
   }
 
+ 
+  handleMouseMove(event)
+  {
+    var y = event.offsetY;
+  
+    console.log("this.player1.y: "+this.player1.pos.y);
+    console.log("y "+y);
 
+    if(y < HEIGHT-(this.player1.size.y-25))
+    {
+      this.player1.pos.y = y;
+    }
+  }
 
 
   /*
@@ -166,6 +188,7 @@ class Pong
   
 
 var canvas, context;
+var prev_x, prev_y;
 
 function main()
 {
@@ -173,13 +196,12 @@ function main()
   canvas = document.getElementById('mycanvas');
 
   const pong = new Pong(canvas);
+  canvas.addEventListener('mousemove', pong.handleMouseMove.bind(pong));
 }
 
 
 
 
-function draw()
-{
-}
+
 
 main();
