@@ -66,7 +66,8 @@ class Player extends Rect
    */
   reset()
   {
-    this.pos = this.home;
+    this.pos.x = this.home.x;
+    this.pos.y = this.home.y;
   }
 }
 
