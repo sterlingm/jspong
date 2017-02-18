@@ -103,6 +103,10 @@ class Pong
     this.ball.vel.x = 200;
     this.ball.vel.y = 200;
 
+    this.ball_theta_limit = 1.0472; // 60 degrees
+    this.ball_speed_min   = 200;
+    this.ball_speed_max   = 450;
+
     this.player1 = new Player(true);
     this.player2 = new Player(false);
     
@@ -142,8 +146,26 @@ class Pong
    */
   start()
   {
-    this.ball.vel.x = 200;
-    this.ball.vel.y = 200;
+    // Get angle for ball vector direction
+    var theta = (Math.random() * 2 * this.ball_theta_limit) - this.ball_theta_limit;
+
+    // Unit vector based on theta
+    var unit = new Vec2(Math.cos(theta), Math.sin(theta));
+
+    // Get random ball speed
+    var speed = Math.floor((Math.random() * this.ball_speed_min) + this.ball_speed_max);
+
+    // Set ball velocity vector
+    this.ball.vel.x = speed * unit.x;
+    this.ball.vel.y = speed * unit.y;
+
+    // See which player goes first
+    // If speed was even, make left player go first
+    // Default ball vector will be in positive x direction so only one check is needed
+    if(speed % 2 == 0)
+    {
+      this.ball.vel.x = -this.ball.vel.x;
+    }
   }
 
   /*
