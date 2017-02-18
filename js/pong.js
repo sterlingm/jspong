@@ -146,25 +146,28 @@ class Pong
    */
   start()
   {
-    // Get angle for ball vector direction
-    var theta = (Math.random() * 2 * this.ball_theta_limit) - this.ball_theta_limit;
+    if(this.ball.vel.x == 0)
+      {
+      // Get angle for ball vector direction
+      var theta = (Math.random() * 2 * this.ball_theta_limit) - this.ball_theta_limit;
 
-    // Unit vector based on theta
-    var unit = new Vec2(Math.cos(theta), Math.sin(theta));
+      // Unit vector based on theta
+      var unit = new Vec2(Math.cos(theta), Math.sin(theta));
 
-    // Get random ball speed
-    var speed = Math.floor((Math.random() * this.ball_speed_min) + this.ball_speed_max);
+      // Get random ball speed
+      var speed = Math.floor((Math.random() * this.ball_speed_min) + this.ball_speed_max);
 
-    // Set ball velocity vector
-    this.ball.vel.x = speed * unit.x;
-    this.ball.vel.y = speed * unit.y;
+      // Set ball velocity vector
+      this.ball.vel.x = speed * unit.x;
+      this.ball.vel.y = speed * unit.y;
 
-    // See which player goes first
-    // If speed was even, make left player go first
-    // Default ball vector will be in positive x direction so only one check is needed
-    if(speed % 2 == 0)
-    {
-      this.ball.vel.x = -this.ball.vel.x;
+      // See which player goes first
+      // If speed was even, make left player go first
+      // Default ball vector will be in positive x direction so only one check is needed
+      if(speed % 2 == 0)
+      {
+        this.ball.vel.x = -this.ball.vel.x;
+      }
     }
   }
 
@@ -178,7 +181,7 @@ class Pong
     {
       console.log("Resetting");
       this.reset();
-      this.start();
+      //this.start();
       console.log("Width: "+WIDTH+" Height: "+HEIGHT);
       console.log("ball pos:"+this.ball.pos.x+", "+this.ball.pos.y);
       console.log("ball vel:"+this.ball.vel.x+", "+this.ball.vel.y);
@@ -304,6 +307,15 @@ class Pong
     }
   }
 
+  /*
+   * Callback for mouse up events
+   * Starts a game if ball is not currently in motion
+   */
+  handleMouseUp(event)
+  {
+    this.start();
+  }
+
 
   /*
    * Starts the Pong game
@@ -325,6 +337,7 @@ function main()
 
   const pong = new Pong(canvas);
   canvas.addEventListener('mousemove', pong.handleMouseMove.bind(pong));
+  canvas.addEventListener('mouseup', pong.handleMouseUp.bind(pong));
 }
 
 
