@@ -82,7 +82,6 @@ class Ball extends Rect
 
   reset()
   {
-    console.log("In ball.reset()");
     this.pos.x = this.home.x;
     this.pos.y = this.home.y;
     this.vel = new Vec2;
@@ -98,17 +97,50 @@ class Pong
     this._context = canvas.getContext('2d');
   
     this.ball = new Ball();
-    this.ball.pos.x = 100;
-    this.ball.pos.y = 100;
-    this.ball.vel.x = 200;
-    this.ball.vel.y = 200;
 
+    // Set some variables for the game
     this.ball_theta_limit = 1.0472; // 60 degrees
     this.ball_speed_min   = 200;
     this.ball_speed_max   = 450;
 
+    // Create the players
     this.player1 = new Player(true);
     this.player2 = new Player(false);
+
+
+    // Create the numbers...
+    // Create a new canvas (for each number) to draw them on
+    this.CHAR_PIXEL = 10;
+    this.numbers = [
+      '111101101101111',
+      '010010010010010',
+      '111001111100111',
+      '111001111001111',
+      '101101111001001',
+      '111100111001111',
+      '111100111101111',
+      '111101001001001',
+      '111101111101111',
+      '111101111001001'
+      ].map(str => {
+        // Create canvas and get context
+        const can = document.createElement('canvas');
+        can.height = this.CHAR_PIXEL * 5;
+        can.width = this.CHAR_PIXEL * 3;
+        const context = can.getContext('2d');
+        context.fillStyle = '#fff';
+
+        // Iterate through numbers
+        str.split('').forEach((fill, i) => {
+          if(fill === '1') {
+            context.fillRect((i % 3) * this.CHAR_PIXEL, 
+              (i / 3 | 0) * this.CHAR_PIXEL,
+              this.CHAR_PIXEL, this.CHAR_PIXEL);
+          }
+        });
+
+        return can;
+      });
     
     /*
      * Main callback to do animation
@@ -124,9 +156,13 @@ class Pong
       requestAnimationFrame(callback);
     };
 
+    // Reset ball position
+    this.reset();
+
     // Set AI movement
     this.player2.vel.y = 200;
 
+    // Start the callbacks
     callback();
   }
 
@@ -140,6 +176,45 @@ class Pong
     this._context.fillRect(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
   }
 
+
+  drawScore()
+  {
+    const align = this._canvas.width / 3;
+    const CHAR_WIDTH = this.CHAR_PIXEL * 4;
+
+    var players = [this.player1, this.player2];
+
+    players.forEach((player, i) => {
+      const chars = player.score.toString().split('');
+      const offset = align * (i+1) - (CHAR_WIDTH * chars.length / 2) * this.CHAR_PIXEL / 2;
+
+      this._context.drawImage( this.numbers[player.score], offset + (i+1) * CHAR_WIDTH, 20);
+    });
+
+  }
+
+
+  /*
+   * Draws the ball, player paddles, player scores, and separating line
+   */
+  draw()
+  {
+    // Create the black background rectangle
+    this._context.fillStyle = '#000';
+    this._context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the ball
+    this.drawRect(this.ball);
+
+    // Draw the players
+    this.drawRect(this.player1);
+    this.drawRect(this.player2);
+
+    // Draw the score
+    this.drawScore();
+  }
+
+ 
 
   /*
    * Start the game by assigning the ball a random vector
@@ -181,7 +256,6 @@ class Pong
     {
       console.log("Resetting");
       this.reset();
-      //this.start();
       console.log("Width: "+WIDTH+" Height: "+HEIGHT);
       console.log("ball pos:"+this.ball.pos.x+", "+this.ball.pos.y);
       console.log("ball vel:"+this.ball.vel.x+", "+this.ball.vel.y);
@@ -232,12 +306,9 @@ class Pong
    */
   collisionCheck()
   {
-    /*if(this.ball.right > canvas.width || this.ball.left < 0)
-    {
-      this.ball.vel.x *= -1;
-    }*/
 
     // Seems to still be some jittering errors with this one
+    // Check for collision against player 2
     if(this.ball.right > this.player2.left &&
         this.ball.bottom < (this.player2.bottom+25) &&
         this.ball.top > this.player2.top)
@@ -245,6 +316,7 @@ class Pong
       this.ball.vel.x *= -1;
     }
         
+    // Check for collision against player 1
     if(this.ball.left < this.player1.right &&
         this.ball.bottom < this.player1.bottom &&
         this.ball.top > this.player1.top)
@@ -252,7 +324,7 @@ class Pong
       this.ball.vel.x *= -1;
     }
         
-      
+    // Check for collision against boundaries      
     if(this.ball.top > canvas.height || this.ball.bottom < 0)
     {
       this.ball.vel.y *= -1;
@@ -272,24 +344,7 @@ class Pong
     this.ball.reset();
   }
 
-  /*
-   * Draws the ball, player paddles, player scores, and separating line
-   */
-  draw()
-  {
-    // Create the black background rectangle
-    this._context.fillStyle = '#000';
-    this._context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw the ball
-    this.drawRect(this.ball);
-
-    // Draw the players
-    this.drawRect(this.player1);
-    this.drawRect(this.player2);
-  }
-
- 
   /*
    * Callback for mouse move events
    * Moves the player1 paddle to the mouse y position
@@ -327,8 +382,6 @@ class Pong
 }
   
 
-var canvas, context;
-var prev_x, prev_y;
 
 function main()
 {
