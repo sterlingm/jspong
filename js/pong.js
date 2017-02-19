@@ -246,6 +246,13 @@ class Pong
     }
   }
 
+  end_game()
+  {
+    this.player1.score = 0;
+    this.player2.score = 0;
+    this.reset();
+  }
+
   /*
    * Updates entity positions
    * @param 0 numeric value for the elapsed time since the last call to this function
@@ -259,6 +266,10 @@ class Pong
       console.log("Width: "+WIDTH+" Height: "+HEIGHT);
       console.log("ball pos:"+this.ball.pos.x+", "+this.ball.pos.y);
       console.log("ball vel:"+this.ball.vel.x+", "+this.ball.vel.y);
+    }
+    if(this.player1.score >= 9 || this.player2.score >= 9)
+    {
+      this.end_game();
     }
     this.ball.pos.x += this.ball.vel.x * dt;
     this.ball.pos.y += this.ball.vel.y * dt;
